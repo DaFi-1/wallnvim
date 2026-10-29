@@ -1,116 +1,60 @@
 # wallnvim
 
-## Para que serve?
+Seletor visual de wallpapers em janela flutuante pro Neovim. 
 
-O **wallnvim** é um seletor visual de papéis de parede (*wallpapers*) em janela flutuante para o [Neovim](https://neovim.io/).
+Suporte a **imagens** (com miniaturas) e **sem imagem** (modo lista). Tem dois layouts: `grid` e `list`/`text`. No `auto` detecta se o terminal suporta imagens via Kitty Graphics Protocol (Kitty, WezTerm, Ghostty, Konsole, tmux).
 
-Ele permite navegar entre as imagens do seu diretório de wallpapers e definir qualquer uma delas como papel de parede com um único `Enter`, sem sair do Neovim.
+![wallnvim](./screenshot_2026-10-29_00-58-51.png)
 
-**Tem suporte a imagens e modo sem imagem.** Há **dois layouts** disponíveis: `grid` (com miniaturas) e `list`/`text` (apenas nomes). No modo `auto`, o plugin detecta automaticamente se seu terminal suporta imagens via [Kitty Graphics Protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/) (compatível com Kitty, WezTerm, Ghostty, Konsole e `tmux`) e escolhe o melhor layout. Caso não haja suporte, usa o modo texto automaticamente.
+## Instalação
 
-**Principais funcionalidades:**
-- **Dois layouts** - `grid` com miniaturas ou `list`/`text` com nomes
-- **Suporte a imagens** - Renderização com Kitty Graphics Protocol quando disponível
-- **Cache persistente** - Miniaturas e metadados salvos em SQLite via LuaJIT FFI para carregamento instantâneo
-- **Geração automática** - Miniaturas 320x180 geradas automaticamente com `ffmpeg` apenas para imagens novas ou modificadas
-- **Modo texto/fallback** - Funciona em qualquer terminal sem suporte gráfico
-- **Integração com `feh`** - Define o wallpaper usando seu gerenciador de wallpapers configurável
-
-## Como usar
-
-### Requisitos
-
-- [Neovim](https://neovim.io/) >= 0.10.0
-- [feh](https://feh.finalrewind.org/) (ou outro utilitário configurável via `cmd`)
-- [ffmpeg](https://ffmpeg.org/) (para gerar as miniaturas)
-- [sqlite3](https://sqlite.org/) ou `libsqlite3` (para o cache persistente)
-
-### Instalação
-
-Basta adicionar o plugin. Exemplo com [lazy.nvim](https://github.com/folke/lazy.nvim):
+Use com [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
   "DaFi-1/wallnvim",
   config = function()
     require("wallnvim").setup({
-      keymap = "<space>l",        -- Atalho para abrir o seletor
-      dir = "~/Pictures/wallpapers", -- Diretório com suas imagens
-      layout = "auto",            -- "grid", "list", "text" ou "auto"
-      cmd = "feh",                -- Comando para definir wallpaper
+      keymap = "<space>l",        -- Atalho para abrir
+      dir = "~/Pictures/wallpapers", -- Pasta com seus wallpapers
+      layout = "auto",            -- "grid" | "list" | "text" | "auto"
+      cmd = "feh",                -- Comando para aplicar wallpaper
       cmd_args = { "--no-fehbg", "--bg-fill" },
-      width = 110,               -- Largura da janela flutuante
-      height = 32,               -- Altura da janela flutuante
-      cell_width = 16,           -- Largura de cada célula na grade
-      cell_height = 6,           -- Altura de cada célula na grade
-      gap = 1,                   -- Espaçamento entre células
-      border = "rounded",        -- Borda da janela
-      preload = true,            -- Pré-carrega miniaturas ao iniciar
+      width = 110,
+      height = 32,
+      cell_width = 16,
+      cell_height = 6,
+      gap = 1,
+      border = "rounded",
+      preload = true,
     })
   end,
 }
 ```
 
-Você pode modificar qualquer uma dessas opções conforme sua preferência. Não é obrigatório passar todas, o plugin já vem com valores padrão.
+Pode mudar qualquer opção acima. Todas tem padrão, não precisa passar tudo.
 
-#### Com [packer.nvim](https://github.com/wbthomason/packer.nvim)
+**Requisitos:** Neovim >= 0.10.0, `feh`, `ffmpeg`, `sqlite3` ou `libsqlite3`  
+**Formatos:** `.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`, `.gif`
 
-```lua
-use {
-  "DaFi-1/wallnvim",
-  config = function()
-    require("wallnvim").setup({
-      keymap = "<space>l",
-      dir = "~/Pictures/wallpapers",
-    })
-  end
-}
-```
+## Comandos
 
-#### Com [vim-plug](https://github.com/junegunn/vim-plug)
-
-```vim
-Plug 'DaFi-1/wallnvim'
-
-lua << EOF
-require("wallnvim").setup({
-  keymap = "<space>l",
-  dir = "~/Pictures/wallpapers",
-})
-EOF
-```
-
-### Formatos de imagem suportados
-
-`.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp`, `.gif`
-
-## Comandos do plugin
-
-| Comando | Descrição |
+| Comando | Ação |
 | --- | --- |
-| `:WallNvim` | Abre o seletor visual de wallpapers |
-| `:WallToggle` | Alterna entre abrir e fechar o seletor |
-| `:WallSet <caminho>` | Define um wallpaper diretamente, sem abrir a interface |
+| `:WallNvim` | Abrir seletor |
+| `:WallToggle` | Abrir/fechar seletor |
+| `:WallSet <caminho>` | Aplicar wallpaper direto pelo caminho |
 
-## Teclas de atalho
-
-### Na janela do seletor
+## Teclas
 
 | Tecla | Ação |
 | --- | --- |
-| `h` / `←` | Navegar para a célula à esquerda |
-| `l` / `→` | Navegar para a célula à direita |
-| `k` / `↑` | Navegar para a célula acima |
-| `j` / `↓` | Navegar para a célula abaixo |
-| `<Tab>` | Alterna entre layout em grade (`grid`) e lista (`list`/`text`) |
-| `<CR>` / `Enter` | Define a imagem selecionada como wallpaper |
-| `q` / `<Esc>` / `<C-c>` | Fecha o seletor |
+| `h/j/k/l` ou `←/↓/↑/→` | Navegar |
+| `<Tab>` | Alternar entre grid/lista |
+| `<CR>` | Aplicar wallpaper selecionado |
+| `q` / `<Esc>` / `<C-c>` | Fechar |
 
-### Atalho global (opcional)
-
-Se configurado com `keymap`, você pode abrir o seletor diretamente com o atalho definido (padrão desativado).
-
-## Licença de Código Aberto
+## Licença
 
 MIT License
 
