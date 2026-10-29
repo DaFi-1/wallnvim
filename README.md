@@ -1,4 +1,4 @@
-# wallnvim
+![logo](./logo.jpeg)
 
 Seletor visual de wallpapers em janela flutuante pro Neovim. 
 
